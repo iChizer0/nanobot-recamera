@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="${SCRIPT_DIR}/nanobot"
 GITHUB_REPO="HKUDS/nanobot"
 
-# ── 1. Parse target platform and python version arguments ─────────────────────
+# Parse target platform and python version arguments
 if [ $# -lt 2 ]; then
   echo "Usage: $0 <platform> <python-version>" >&2
   echo "  e.g. $0 armv7 3.11" >&2
@@ -16,7 +16,7 @@ PLATFORM="$1"
 PY_VERSION="$2"
 PY_VERSION_NODOT="${PY_VERSION//./}"
 
-# ── Pre-flight checks ────────────────────────────────────────────────────────
+# Pre-flight checks
 if ! command -v docker >/dev/null 2>&1; then
   echo "Error: docker is required." >&2
   exit 1
@@ -27,7 +27,15 @@ if ! docker buildx version >/dev/null 2>&1; then
   exit 1
 fi
 
-# ── 2. Find latest release version from GitHub ───────────────────────────────
+# Ensure a buildx builder with cross-platform support exists
+BUILDER_NAME="nanobot-multiarch"
+if ! docker buildx inspect "$BUILDER_NAME" >/dev/null 2>&1; then
+  echo "==> Creating buildx builder '${BUILDER_NAME}' with QEMU support ..."
+  docker buildx create --name "$BUILDER_NAME" --driver docker-container --bootstrap
+fi
+docker buildx use "$BUILDER_NAME"
+
+# Find latest release version from GitHub
 echo "==> Fetching latest release from github.com/${GITHUB_REPO} ..."
 
 CURL_OPTS=(-fsSL)
@@ -48,7 +56,7 @@ fi
 
 echo "    Latest release : $LATEST_VERSION"
 
-# ── 3. Compare with current version ──────────────────────────────────────────
+# Compare with current version
 CURRENT_VERSION="${NANOBOT_VERSION_CURRENT:-}"
 echo "    Current version: ${CURRENT_VERSION:-<not set>}"
 
@@ -57,9 +65,9 @@ if [ "$LATEST_VERSION" = "$CURRENT_VERSION" ]; then
   exit 0
 fi
 
-echo "==> Version differs – proceeding with download and build."
+echo "==> Version differs - proceeding with download and build."
 
-# ── 4. Download and extract the latest release ───────────────────────────────
+# Download and extract the latest release
 TARBALL_URL="https://github.com/${GITHUB_REPO}/archive/refs/tags/${LATEST_VERSION}.tar.gz"
 DOWNLOAD_DIR="${SCRIPT_DIR}/downloads"
 TARBALL_PATH="${DOWNLOAD_DIR}/${LATEST_VERSION}.tar.gz"
@@ -74,7 +82,7 @@ rm -rf "$REPO_DIR"
 mkdir -p "$REPO_DIR"
 tar -xzf "$TARBALL_PATH" -C "$REPO_DIR" --strip-components=1
 
-# ── 5. Build the Python wheelhouse for the specified platform ─────────────────
+# Build the Python wheelhouse for the specified platform
 EXTRAS="${EXTRAS:-}"
 OUT_DIR="${SCRIPT_DIR}/dist/${PLATFORM}-py${PY_VERSION_NODOT}-wheelhouse"
 
@@ -111,7 +119,7 @@ docker buildx build \
   --output "type=local,dest=$OUT_DIR" \
   "$REPO_DIR"
 
-# buildx local output keeps stage root; wheelhouse will be under $OUT_DIR/wheelhouse
+# Check if wheelhouse was generated
 WHEEL_DIR="$OUT_DIR/wheelhouse"
 if [ ! -d "$WHEEL_DIR" ]; then
   echo "Error: wheelhouse output not found at $WHEEL_DIR" >&2
