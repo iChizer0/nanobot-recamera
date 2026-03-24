@@ -21,11 +21,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Get current release version from iChizer0/nanobot-recamera (may not exist)
+          # Get current release version from Seeed-Projects/nanobot-recamera (may not exist)
           CURRENT_VERSION="$(
             curl -fsSL \
               -H "Authorization: token ${GH_TOKEN}" \
-              "https://api.github.com/repos/iChizer0/nanobot-recamera/releases/latest" \
+              "https://api.github.com/repos/Seeed-Projects/nanobot-recamera/releases/latest" \
             | jq -r '.tag_name // empty' 2>/dev/null
           )" || CURRENT_VERSION=""
 

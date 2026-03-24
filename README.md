@@ -7,14 +7,14 @@ Pre-built [nanobot](https://github.com/HKUDS/nanobot) wheels for the Seeed reCam
 Run on your reCamera:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/iChizer0/nanobot-recamera/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Seeed-Projects/nanobot-recamera/main/install.sh | bash
 ```
 
 The script auto-detects your Python version, downloads the matching wheelhouse from the latest release, and installs it offline via pip.
 
 ## Manual Install
 
-1. Download the wheelhouse tarball for your Python version from the [Releases](https://github.com/iChizer0/nanobot-recamera/releases) page, e.g.:
+1. Download the wheelhouse tarball for your Python version from the [Releases](https://github.com/Seeed-Projects/nanobot-recamera/releases) page, e.g.:
 
    ```
    nanobot-armv7-py311-wheelhouse.tar.gz # Python 3.11

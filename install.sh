@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-GITHUB_REPO="iChizer0/nanobot-recamera"
+GITHUB_REPO="Seeed-Projects/nanobot-recamera"
 PLATFORM="armv7"
 
 # Detect Python version
